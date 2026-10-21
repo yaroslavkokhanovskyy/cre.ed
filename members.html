@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Learning | CRE-Ed</title><meta name="description" content="Your lessons, worksheets, Deal Analyzer and coaching desk."><meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css"></head><body class="gate">
+<div class="apphead"><div class="wrap"><nav class="comps" id="tabs" aria-label="My Learning"></nav></div></div>
+<main class="app"><div class="wrap" id="view"></div></main>
+<script src="assets/config.js"></script><script src="assets/weeks.js"></script><script src="assets/offer2.js"></script><script src="assets/library.js"></script><script src="assets/site.js"></script>
+<script>CRE.init({page:'members',auth:true}).then(ok=>{if(!ok)return;
+const $=id=>document.getElementById(id),E=CRE.esc,V=$('view');
+const has1=()=>CRE.Access.has('bcr90'),has2=()=>CRE.Access.has('deal90'),O2=CRE.O2;
+let tok=0,flush=null;
+const unlock=(t,d)=>`<div class="card hl" style="margin:22px 0"><h3>${t}</h3><p style="color:var(--muted)">${d}</p><a class="btn" href="programs.html">See the programs</a></div>`;
+const bar=(done,total)=>`<div style="max-width:460px;margin:6px 0 22px"><div class="progress"><i style="width:${total?Math.round(done/total*100):0}%"></i></div><p class="fine" style="margin:8px 0 0">${done} of ${total} complete</p></div>`;
+const title=t=>document.title=t+' | CRE-Ed';
+
+/* ---------- Free library ---------- */
+function optin(){
+ if(CRE.S.user.marketing||sessionStorage.getItem('creed-optin-hide'))return '';
+ return `<div class="card hl" id="optc" style="margin:0 0 22px;padding:18px 22px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span><b>Want a reminder when new lessons and tips come out?</b><br><span class="fine">We’ll email you free content. Unsubscribe any time.</span></span><span style="display:flex;gap:8px"><button class="btn sm" id="optyes">Yes, email me</button><button class="btn ghost sm" id="optno">No thanks</button></span></div>`;
+}
+function bindOptin(){
+ const y=$('optyes'),n=$('optno');if(!y)return;
+ y.onclick=async()=>{await CRE.Auth.setMarketing(true);$('optc').outerHTML='<p class="msg show ok">Thanks. We’ll keep you posted.</p>';};
+ n.onclick=()=>{try{sessionStorage.setItem('creed-optin-hide','1')}catch(e){}$('optc').remove();};
+}
+const embed=u=>{let m=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{6,})/);if(m)return `<iframe src="https://www.youtube.com/embed/${m[1]}?rel=0" allow="fullscreen; picture-in-picture" allowfullscreen></iframe>`;m=u.match(/vimeo\.com\/(\d+)/);if(m)return `<iframe src="https://player.vimeo.com/video/${m[1]}" allow="fullscreen" allowfullscreen></iframe>`;if(/\.(mp4|webm|mov)(\?|$)/i.test(u)||u.startsWith('blob:'))return `<video src="${E(u)}" controls playsinline autoplay></video>`;return '';};
+async function vLibrary(){
+ title('Free Library');
+ const nm=(CRE.S.user.name||'').split(' ')[0],member=has1()||has2(),admin=CRE.Data.isAdmin();
+ let up=await CRE.Data.library(),cat='All',q='';
+ const built=CREED_LIB.items.map(i=>({id:i.id,kind:i.kind,category:i.category,title:i.title,description:i.desc,href:i.href,cta:i.cta,built:1}));
+ const all=()=>up.map(x=>Object.assign({cta:/video/i.test(x.kind)?'Watch':'Open'},x)).concat(built);
+ V.innerHTML=`<h1>${nm?E(nm)+', your free library':'Your free library'}</h1><p class="lead">Free videos from Lijoy.</p>
+  <div class="libbar" id="lbar"><div class="chips" id="lcats"></div><div class="lsearch"><label class="sr" for="lq">Search the library</label><input id="lq" type="search" placeholder="Search the library"></div></div>
+  <div class="libgrid" id="lgrid"></div>
+  ${admin?`<details class="card libadmin" id="ladm"><summary>Add content to the library</summary><form id="lf"><div class="row2"><div><label for="lt">Title</label><input id="lt" required maxlength="120"></div><div><label for="lk">Type</label><select id="lk"><option>Video</option><option>Guide</option><option>Tool</option></select></div></div><label for="ld">Short description</label><textarea id="ld" rows="2" maxlength="300"></textarea><div class="row2"><div><label for="lc">Category</label><input id="lc" value="Videos" list="lcl"><datalist id="lcl"><option>Videos</option><option>Guides</option><option>Tools</option></datalist></div><div><label for="lfile">Upload a file (video or PDF)</label><input id="lfile" type="file" accept="video/*,application/pdf,image/*"></div></div><label for="llink">Or paste a link (YouTube, Vimeo or any web address)</label><input id="llink" type="url" placeholder="https://"><p class="fine">${CRE.DEMO?'Preview mode: uploads last only for this visit. Connect Supabase to keep them.':'Uploaded files are stored in your Supabase library bucket.'}</p><p style="margin:0"><button class="btn" id="lgo">Add to library</button> <span id="lm" class="fine"></span></p></form></details>`:''}
+  ${member?'':`<div class="gofar"><div><h2>Ready for a coach?</h2><p>Work with Lijoy for 90 days: weekly lessons, feedback on your work, live Q&amp;A and a call every two weeks.</p></div><a class="btn" href="programs.html">See coaching and programs</a></div>`}
+  <div class="modal" id="lmod" hidden><div class="mbox"><button class="mx" id="lmx" aria-label="Close">&times;</button><div class="mplay" id="lplay"></div><h3 id="lmt"></h3></div></div>`;
+ const draw=()=>{const A=all(),cats=['All'].concat([...new Set(A.map(x=>x.category||'General'))]);
+  $('lcats').innerHTML=cats.map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${E(c)}">${E(c)}</button>`).join('');
+  CRE.$$('#lcats .chip').forEach(b=>b.onclick=()=>{cat=b.dataset.c;draw();});
+  const r=A.filter(x=>(cat==='All'||(x.category||'General')===cat)&&(!q||((x.title||'')+' '+(x.description||'')).toLowerCase().includes(q)));
+  $('lbar').style.display=A.length?'':'none';
+  $('lgrid').innerHTML=r.length?r.map(x=>{const href=x.built?x.href:'#',vid=!x.built&&embed(x.url||'');
+   return `<a class="libc" href="${href}" ${x.built?'':`data-id="${E(x.id)}"`}><span class="kind">${E(x.kind)}</span><h3>${E(x.title)}</h3><p>${E(x.description||'')}</p><span class="lk">${E(x.cta)} →</span>${admin&&!x.built?`<button type="button" class="ldel" data-d="${E(x.id)}">Remove</button>`:''}</a>`}).join(''):(A.length?'<p class="fine">Nothing matches. Try another word or category.</p>':'<div class="card"><h3>Videos are coming soon</h3><p style="color:var(--muted);margin:0">Lijoy is adding free lessons here. Check back soon.</p></div>');
+  CRE.$$('#lgrid [data-id]').forEach(a=>a.onclick=e=>{e.preventDefault();if(e.target.closest('.ldel'))return;const x=up.find(u=>String(u.id)===a.dataset.id);if(!x)return;const h=embed(x.url||'');
+   if(h){$('lplay').innerHTML=h;$('lmt').textContent=x.title;$('lmod').hidden=false;}else if(x.url)window.open(x.url,'_blank','noopener');});
+  CRE.$$('#lgrid .ldel').forEach(b=>b.onclick=async e=>{e.preventDefault();e.stopPropagation();if(!confirm('Remove this item from the library?'))return;await CRE.Data.delLibrary(b.dataset.d);up=await CRE.Data.library();draw();});};
+ const close=()=>{$('lmod').hidden=true;$('lplay').innerHTML='';};
+ $('lmx').onclick=close;$('lmod').onclick=e=>{if(e.target===$('lmod'))close();};
+ $('lq').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();draw();});
+ if(admin)$('lf').onsubmit=async e=>{e.preventDefault();const f=$('lfile').files[0],link=$('llink').value.trim();
+  if(!f&&!link){$('lm').textContent='Add a file or paste a link.';return;}
+  $('lgo').disabled=true;$('lm').textContent=f?'Uploading. Large videos can take a few minutes.':'Saving.';
+  const r=await CRE.Data.addLibrary({kind:$('lk').value,title:$('lt').value.trim(),description:$('ld').value.trim(),category:$('lc').value.trim()||'General',link},f);
+  $('lgo').disabled=false;if(r.error){$('lm').textContent='Could not add it: '+r.error;return;}
+  $('lf').reset();$('lc').value='Videos';$('lm').textContent='Added.';up=await CRE.Data.library();draw();};
+ draw();
+}
+async function vGuide(a){
+ title('Glossary');
+ V.innerHTML=`<div class="crumb"><a href="#/library">Free Library</a> / Glossary</div><h1>Commercial real estate glossary</h1><p class="lead">${CREED_LIB.glossary.length} terms every new agent and investor needs, in plain English.</p><div style="max-width:420px;margin-bottom:18px"><label class="sr" for="gq">Search terms</label><input id="gq" type="search" placeholder="Search a term, like NOI or DSCR"></div><dl class="gloss" id="gl"></dl>`;
+ const draw=()=>{const q=$('gq').value.trim().toLowerCase();const r=CREED_LIB.glossary.filter(([t,d])=>!q||(t+' '+d).toLowerCase().includes(q));
+  $('gl').innerHTML=r.length?r.map(([t,d])=>`<div><dt>${E(t)}</dt><dd>${E(d)}</dd></div>`).join(''):'<p class="fine">No match. Try a different word, or ask Lijoy.</p>';};
+ $('gq').addEventListener('input',draw);draw();
+}
+
+/* ---------- Offers ---------- */
+const OF=CRE.OFFERS;
+const lockPage=o=>`<div class="lockpage"><p class="eyebrow">Offer ${o.n}</p><h1>${E(o.name)}</h1><p class="lead">${E(o.who)}</p><ul class="checks">${o.bullets.map(b=>`<li>${E(b)}</li>`).join('')}</ul><p><a class="btn" href="programs.html">See coaching and programs</a></p><p class="fine">Coaching from Lijoy is included. 30-day money-back guarantee.</p></div>`;
+async function vP1(){
+ title('Offer 1');
+ if(!has1()){V.innerHTML=lockPage(OF.bcr90);return;}
+ const P=await CRE.progress(),W=CRE.WEEKS,first=W.find(w=>P.per[w.n].done<P.per[w.n].total)||W[11],hw=P.hw[first.n]||{},todo=first.hw.filter((t,i)=>!hw[i]);let ph=0;
+ V.innerHTML=`<p class="eyebrow">Offer 1</p><h1>Become a Commercial Realtor in 90 Days</h1>${bar(P.done,P.total).replace('complete','homework steps complete')}
+  <div class="card upnext"><p class="eyebrow">Up next · Week ${first.n}</p><h3>${E(first.title)}</h3><p style="color:var(--muted)">${E(first.toolDesc)}</p>${todo.length?`<ul class="checks">${todo.slice(0,3).map(t=>`<li>${E(t)}</li>`).join('')}</ul>`:'<p><span class="pill ok">Week complete</span></p>'}<p style="display:flex;gap:10px;flex-wrap:wrap;margin:0"><a class="btn" href="#/week/${first.n}">Open Week ${first.n}</a><a class="btn ghost" href="#/sheet/w/${first.n}">Worksheet</a><a class="btn ghost" href="#/coach">Coaching desk</a></p></div>
+  <div id="phs"></div>`;
+ $('phs').innerHTML=CRE.PHASES.map(ph=>{const ws=W.filter(w=>w.phase===ph.n);
+  return `<section class="phsec"><div class="phh"><h2>${E(ph.name)}</h2><span class="fine">Weeks ${ws[0].n} to ${ws[ws.length-1].n}</span></div><div class="wlist">`+ws.map(w=>{const pr=P.per[w.n],full=pr.done===pr.total;
+   return `<a class="wrow" href="#/week/${w.n}"><span class="wn ${full?'ok':''}">${full?'✓':w.n}</span><span class="wt"><b>${E(w.title)}</b><small>${E(w.tool)}</small></span><span class="ws"><span class="pill ${full?'ok':pr.done?'gold':''}">${full?'Complete':pr.done?pr.done+' of '+pr.total+' steps':'Start'}</span></span></a>`}).join('')+`</div></section>`;}).join('');
+}
+async function vP2(){
+ title('Offer 2');
+ if(!has2()){V.innerHTML=lockPage(OF.deal90);return;}
+ const P=await CRE.progress2(),mod=O2.MODULES.find(m=>P.per[m.n].done<P.per[m.n].total)||O2.MODULES[7],hw=P.hw[O2.lessonKey(mod.n)]||{},todo=mod.lessons.filter((l,i)=>!hw[i]);
+ V.innerHTML=`<p class="eyebrow">Offer 2</p><h1>Analyze and Find Your First Commercial Deal in 90 Days</h1>${bar(P.done,P.total).replace('complete','lessons complete')}
+  <div class="card upnext"><p class="eyebrow">Up next · Module ${mod.n}</p><h3>${E(mod.title)}</h3><p style="color:var(--muted)">${E(mod.blurb)}</p>${todo.length?`<ul class="checks">${todo.slice(0,3).map(l=>`<li>${E(l.t)}</li>`).join('')}</ul>`:'<p><span class="pill ok">Module complete</span></p>'}<p style="display:flex;gap:10px;flex-wrap:wrap;margin:0"><a class="btn" href="#/module/${mod.n}">Open Module ${mod.n}</a><a class="btn ghost" href="#/analyzer">Deal Analyzer</a><a class="btn ghost" href="#/coach">Coaching desk</a></p></div>
+  <h2 style="font-size:26px;margin:36px 0 0">All 8 modules</h2><div class="tools">`+O2.MODULES.map(m=>{const pr=P.per[m.n],full=pr.done===pr.total,mins=m.lessons.reduce((a,l)=>a+l.min,0);
+  return `<a class="tool" href="#/module/${m.n}"><h3>Module ${m.n} · ${E(m.title)}</h3><p>${E(m.blurb)}</p><span class="st"><span class="pill ${full?'ok':'gold'}">${full?'Complete':pr.done+' of '+pr.total+' lessons'}</span><span class="fine">${m.lessons.length} lessons · ${mins} min</span></span></a>`}).join('')+`</div>`;
+}
+
+/* ---------- Free lesson ---------- */
+async function mountPlayer(pl,file,label){
+ const html=await CRE.Data.episode(file);const f=document.createElement('iframe');f.setAttribute('sandbox','allow-scripts');f.setAttribute('allow','autoplay; fullscreen');f.setAttribute('allowfullscreen','');f.title=label;f.srcdoc=html;pl.innerHTML='';pl.appendChild(f);
+ const fb=document.createElement('button');fb.type='button';fb.className='fsb';fb.textContent='Full screen';
+ fb.onclick=()=>{const r=pl.requestFullscreen||pl.webkitRequestFullscreen;if(document.fullscreenElement){document.exitFullscreen();}else if(r)r.call(pl);else if(f.requestFullscreen)f.requestFullscreen();};
+ document.addEventListener('fullscreenchange',()=>{fb.textContent=document.fullscreenElement?'Exit full screen':'Full screen';});pl.appendChild(fb);
+}
+async function vLesson(a){
+ const it=CREED_LIB.items.find(x=>x.id===a[0]&&x.file);
+ if(!it){location.hash='#/library';return;}
+ title(it.title);
+ V.innerHTML=`<div class="crumb"><a href="#/library">Free Library</a> / ${E(it.title)}</div><p class="eyebrow">Free lesson</p><h1 style="margin-bottom:22px">${E(it.title)}</h1><div class="player" id="player"><div class="ph">Loading video…</div></div><p class="lead" style="margin-top:22px">${E(it.desc)}</p>
+  <div class="gofar"><div><h2>Want help with your first deal?</h2><p>Work with Lijoy for 90 days: weekly lessons, feedback on your work, live Q&amp;A and a call every two weeks.</p></div><a class="btn" href="programs.html">See coaching and programs</a></div>`;
+ try{await mountPlayer($('player'),it.file,it.title);}catch(e){$('player').innerHTML='<div class="ph">The video could not be loaded. Please refresh, or contact us if it keeps happening.</div>';}
+}
+
+/* ---------- Week ---------- */
+async function vWeek(a){
+ const n=Math.min(12,Math.max(1,+a[0]||1)),w=CRE.WEEKS[n-1];title('Week '+n+': '+w.title);
+ V.innerHTML=`<div class="crumb">${has1()?'<a href="#/p1">90-Day Program</a>':'<a href="#/library">Free Library</a>'} / Week ${n}</div><p class="eyebrow">Week ${n} · ${E(CRE.PHASES[w.phase-1].name)}</p><h1 style="margin-bottom:22px">${E(w.title)}</h1>
+  <div class="player" id="player"><div class="ph">Loading video…</div></div>
+  <div class="grid g2" style="margin-top:28px;align-items:start">
+   <div class="card"><h3>Homework</h3><p class="fine" style="margin:0 0 8px">Tick each step as you finish it.</p><ul class="hw" id="hw"></ul></div>
+   <div style="display:flex;flex-direction:column;gap:20px">
+    <div class="card"><h3>This week’s worksheet</h3><p style="color:var(--muted)">${E(w.sheet.title)}. Saved as you type.</p><p style="display:flex;gap:10px;flex-wrap:wrap;margin:0"><a class="btn sm" href="#/sheet/w/${n}">Open the worksheet</a><a class="btn ghost sm" href="#/sheet/w/${n}?print=1">Print / save as PDF</a></p></div>
+    <div class="card"><h3>Send to your coach</h3><p style="color:var(--muted)">When you finish, send me ${E(w.send)}. I read every submission.</p><a class="btn ghost sm" href="#/coach">Send to Coach Lijoy</a></div>
+   </div></div>
+  <div style="display:flex;justify-content:space-between;gap:12px;margin-top:36px;flex-wrap:wrap" id="pn"></div>`;
+ const pl=$('player');
+ if(!CRE.Access.canWatch(n)){pl.style.aspectRatio='auto';pl.style.background='var(--gold-soft)';pl.innerHTML='<div class="ph" style="position:static;color:var(--ink);padding:44px 24px"><div><h3 style="margin-bottom:10px">Week '+n+' is for members</h3><p style="color:var(--muted);margin:0 0 20px">Unlock all 12 weeks, every worksheet and coaching for 90 days.</p><a class="btn" href="programs.html">See the programs</a></div></div>';}
+ else{try{const html=await CRE.Data.episode(w.file);const f=document.createElement('iframe');f.setAttribute('sandbox','allow-scripts');f.setAttribute('allow','autoplay; fullscreen');f.setAttribute('allowfullscreen','');f.title='Week '+n+': '+w.title;f.srcdoc=html;pl.innerHTML='';pl.appendChild(f);const fb=document.createElement('button');fb.type='button';fb.className='fsb';fb.textContent='Full screen';fb.onclick=()=>{const r=pl.requestFullscreen||pl.webkitRequestFullscreen;if(document.fullscreenElement){document.exitFullscreen();}else if(r)r.call(pl);else if(f.requestFullscreen)f.requestFullscreen();};document.addEventListener('fullscreenchange',()=>{fb.textContent=document.fullscreenElement?'Exit full screen':'Full screen';});pl.appendChild(fb);}
+  catch(e){pl.innerHTML='<div class="ph">The video could not be loaded. Please refresh, or contact us if it keeps happening.</div>';}}
+ const hw=(await CRE.Data.hw())[n]||{};
+ $('hw').innerHTML=w.hw.map((t,i)=>`<li class="${hw[i]?'done':''}"><input type="checkbox" id="h${i}" ${hw[i]?'checked':''}><label for="h${i}" style="margin:0;font-weight:400"><span>${E(t)}</span></label></li>`).join('');
+ CRE.$$('#hw input').forEach((c,i)=>c.onchange=async()=>{c.closest('li').classList.toggle('done',c.checked);await CRE.Data.setHw(n,i,c.checked);});
+ const pv=CRE.WEEKS[n-2],nx=CRE.WEEKS[n];
+ $('pn').innerHTML=(pv?`<a class="btn ghost sm" href="#/week/${n-1}">← Week ${n-1}</a>`:'<span></span>')+(nx?`<a class="btn sm" href="#/week/${n+1}">Week ${n+1}: ${E(nx.title)} →</a>`:'<a class="btn sm" href="#/p1">Back to the program</a>');
+}
+
+/* ---------- Module (Offer 2) ---------- */
+async function vModule(a){
+ if(!has2()){V.innerHTML=`<h1>This area is for Offer 2 members</h1>`+unlock('Unlock the Deal Course','Get the 8 modules, the worksheets, the Deal Analyzer and 90 days of coaching.');return;}
+ const n=Math.min(8,Math.max(1,+a[0]||1)),M=O2.MODULES[n-1],key=O2.lessonKey(n);title('Module '+n+': '+M.title);
+ V.innerHTML=`<div class="crumb"><a href="#/p2">Deal Course</a> / Module ${n}</div><p class="eyebrow">Module ${n} of 8</p><h1>${E(M.title)}</h1><p class="lead">${E(M.blurb)}</p>
+  <div class="card flat" style="padding:6px 24px"><ul class="lessons" id="ls"></ul></div>
+  <div class="grid g2" style="margin-top:28px;align-items:start">
+   <div class="card"><h3>This module’s worksheet</h3><p style="color:var(--muted)">${E(O2.sheets[n].title)}. Saved as you type.</p><p style="display:flex;gap:10px;flex-wrap:wrap;margin:0"><a class="btn sm" href="#/sheet/m/${n}">Open the worksheet</a><a class="btn ghost sm" href="#/analyzer">Deal Analyzer</a></p></div>
+   <div class="card"><h3>Stuck on something?</h3><p style="color:var(--muted)">Ask Savannah, or send your work to Coach Lijoy. Every submission is read personally.</p><a class="btn ghost sm" href="#/coach">Open the coaching desk</a></div>
+  </div><div style="display:flex;justify-content:space-between;gap:12px;margin-top:36px;flex-wrap:wrap" id="pn"></div>`;
+ const hw=(await CRE.Data.hw())[key]||{};
+ $('ls').innerHTML=M.lessons.map((l,i)=>`<li class="${hw[i]?'done':''}"><div class="row"><input type="checkbox" id="l${i}" ${hw[i]?'checked':''} aria-label="Mark lesson complete"><div style="flex:1"><h4><label for="l${i}" style="margin:0;font-weight:700;cursor:pointer">Lesson ${l.n} · ${E(l.t)}</label></h4><p>${E(l.d)}</p><p class="fine" style="margin-top:6px">${l.min} min${l.video?'':' · <span class="pill">Video coming soon</span>'}</p><div class="vid" id="v${i}"></div></div></div></li>`).join('');
+ CRE.$$('#ls input').forEach((c,i)=>c.onchange=async()=>{c.closest('li').classList.toggle('done',c.checked);await CRE.Data.setHw(key,i,c.checked);});
+ const pv=O2.MODULES[n-2],nx=O2.MODULES[n];
+ $('pn').innerHTML=(pv?`<a class="btn ghost sm" href="#/module/${n-1}">← Module ${n-1}</a>`:'<span></span>')+(nx?`<a class="btn sm" href="#/module/${n+1}">Module ${n+1}: ${E(nx.title)} →</a>`:'<a class="btn sm" href="#/p2">Back to the Deal Course</a>');
+ for(const [i,l] of M.lessons.entries()){if(!l.video)continue;try{const html=await CRE.Data.episode(l.video);const f=document.createElement('iframe');f.setAttribute('sandbox','allow-scripts');f.setAttribute('allowfullscreen','');f.style.cssText='width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#07121f';f.title=l.t;f.srcdoc=html;$('v'+i).appendChild(f);}catch(e){}}
+}
+
+/* ---------- Analyzer ---------- */
+async function vAnalyzer(){
+ title('Deal Analyzer');
+ V.innerHTML=`<div class="crumb"><a href="#/p2">Deal Course</a> / Deal Analyzer</div><h1>Deal Analyzer</h1><p class="lead">Normalize the NOI, test the debt, find the equity gap and try a vendor take-back mortgage. Five deals, saved as you type.</p><div class="tools" id="dl"></div>`;
+ if(!has2()){$('dl').innerHTML='';V.insertAdjacentHTML('beforeend',unlock('The Deal Analyzer is for Offer 2 members','Screen five deals at once with the built-in analyzer.'));return;}
+ const cards=[];for(let i=1;i<=O2.DEALS;i++){const d=await CRE.Data.sheet(O2.dealKey(i));cards.push(`<a class="tool" href="#/sheet/d/${i}"><h3>Deal ${'ABCDE'[i-1]}${d.name?' · '+E(d.name):''}</h3><p>${d.name?'Open to keep working on this deal.':'Start a new deal.'}</p><span class="st"><span class="pill ${d.lab==='Pass'?'ok':(d.lab?'gold':'lock')}">${d.lab?E(d.lab):(d.name?'In progress':'Empty')}</span></span></a>`);}
+ $('dl').innerHTML=cards.join('');
+}
+
+/* ---------- Worksheet ---------- */
+async function vSheet(a,q){
+ const kind=a[0],num=+a[1]||1;let C;
+ if(kind==='m'){const n=Math.min(8,Math.max(1,num)),M=O2.MODULES[n-1];
+  C={kind:'m',n,key:O2.sheetKey(n),sh:O2.sheets[n],ok:has2(),lockMsg:'Worksheets are for Offer 2 members.',crumb:'<a href="#/p2">Deal Course</a> / <a href="#/module/'+n+'">Module '+n+'</a>',ey:'Module '+n+' · '+M.title,send:'your module '+n+' worksheet'};}
+ else if(kind==='d'){const n=Math.min(O2.DEALS,Math.max(1,num));
+  C={kind:'d',n,key:O2.dealKey(n),sh:O2.analyzer(n),ok:has2(),lockMsg:'The Deal Analyzer is for Offer 2 members.',crumb:'<a href="#/p2">Deal Course</a> / <a href="#/analyzer">Deal Analyzer</a>',ey:'Deal Analyzer',send:'the deal you analyzed'};}
+ else{const n=Math.min(12,Math.max(1,num)),W=CRE.WEEKS[n-1];
+  C={kind:'w',n,key:n,sh:W.sheet,ok:CRE.Access.canWatch(n)||(CRE.CFG.FREE_SHEETS||[]).includes(n),lockMsg:'Worksheets are for members.',csv:W.csv,crumb:(has1()?'<a href="#/p1">90-Day Program</a>':'<a href="#/library">Free Library</a>')+' / '+(CRE.Access.canWatch(n)?'<a href="#/week/'+n+'">Week '+n+'</a>':'Week '+n),ey:'Week '+n+' · '+W.tool,send:W.send};}
+ const sh=C.sh,n=C.key;title(sh.title);
+ V.innerHTML=`<div class="ws" style="max-width:900px"><div class="crumb">${C.crumb}</div><p class="eyebrow">${E(C.ey)}</p><h1 style="font-size:clamp(30px,4.2vw,44px)">${E(sh.title)}</h1>
+  <div class="dtabs noprint" id="dt"></div><p class="lead" style="margin-top:10px">${E(sh.intro||'')}</p><div id="form"></div>
+  <div class="savebar noprint"><span class="fine" id="st">All changes are saved automatically.</span><span style="flex:1"></span><button class="btn ghost sm" id="csv" style="display:none">Download database template (CSV)</button><button class="btn ghost sm" id="pr">Print / save as PDF</button><a class="btn sm" id="send" href="#/coach">Send to coach</a></div></div>`;
+ if(C.kind==='d')$('dt').innerHTML=Array.from({length:O2.DEALS},(_,i)=>`<a href="#/sheet/d/${i+1}" class="${i+1===C.n?'on':''}">Deal ${'ABCDE'[i]}</a>`).join('');
+ if(!C.ok){$('form').innerHTML='<div class="card hl"><h3>'+E(C.lockMsg)+'</h3><p style="color:var(--muted)">Unlock a program to use every worksheet.</p><a class="btn" href="programs.html">See the programs</a></div>';$('send').style.display='none';$('pr').style.display='none';return;}
+ let data=await CRE.Data.sheet(n);
+ const inp=(f,id)=>{const v=E(data[f.k]!=null?data[f.k]:(f.def||''));
+  if(f.t==='area')return `<textarea id="${id}" rows="${f.rows||3}" placeholder="${E(f.ph||'')}">${v}</textarea>`;
+  if(f.t==='sel')return `<select id="${id}"><option value="">Choose…</option>${f.opts.map(o=>`<option ${data[f.k]===o?'selected':''}>${E(o)}</option>`).join('')}</select>`;
+  if(f.t==='num')return `<input id="${id}" type="number" step="any" inputmode="decimal" ${f.min!=null?`min="${f.min}" max="${f.max}"`:''} placeholder="${E(f.ph||'')}" value="${v}">`;
+  if(f.t==='date')return `<input id="${id}" type="date" value="${v}">`;
+  if(f.t==='check')return '';
+  return `<input id="${id}" type="text" placeholder="${E(f.ph||'')}" value="${v}">`;};
+ const fld=f=>{const id='f_'+f.k,full=f.w==='full'||f.t==='area'?'full':'';
+  if(f.t==='check')return `<div class="${full} chk"><input type="checkbox" id="${id}" ${data[f.k]?'checked':''}><label for="${id}">${E(f.l)}</label></div>`;
+  if(f.t==='calc')return `<div><label>${E(f.l)}</label><div class="calc ${f.strong?'strong':''}" data-calc="${f.k}">—</div></div>`;
+  return `<div class="${full}"><label for="${id}">${E(f.l)}</label>${inp(f,id)}${f.cmp?`<div class="fine" data-cmp="${f.k}" style="margin-top:4px"></div>`:''}</div>`;};
+ const tbl=t=>{const cols=t.cols;let h=`<div class="tblw"><table class="tbl"><thead><tr><th style="width:28px">#</th>${cols.map(c=>`<th>${E(c.l)}</th>`).join('')}</tr></thead><tbody>`;
+  for(let r=0;r<t.rows;r++){h+=`<tr><td class="fine">${r+1}</td>`+cols.map(c=>{const id=`t_${t.k}_${r}_${c.k}`;const pre=(t.pre&&t.pre[r]&&t.pre[r][c.k])||'';
+   const v=data[id]!=null?data[id]:pre;
+   return c.t==='check'?`<td><input type="checkbox" id="${id}" ${data[id]?'checked':''}></td>`:`<td><input id="${id}" type="${c.t==='date'?'date':'text'}" value="${E(v)}" aria-label="${E(c.l)} ${r+1}"></td>`}).join('')+'</tr>';}
+  return h+'</tbody></table></div>';};
+ $('form').innerHTML=sh.sections.map(s=>`<h2>${E(s.h)}</h2>${s.note?`<p class="note">${E(s.note)}</p>`:''}${s.f?`<div class="fg">${s.f.map(fld).join('')}</div>`:''}${s.table?tbl(s.table):''}`).join('');
+ const calcs=[];sh.sections.forEach(s=>(s.f||[]).forEach(f=>{if(f.t==='calc')calcs.push(f);}));
+ const nums={};sh.sections.forEach(s=>(s.f||[]).forEach(f=>{if(f.t==='num')nums[f.k]=1;}));
+ const pmt=(rate,years,loan)=>{const r=rate/100/12,n=years*12;if(!n||!loan)return 0;return (r?loan*r/(1-Math.pow(1+r,-n)):loan/n)*12;};
+ const fmt=(v,t)=>!isFinite(v)||isNaN(v)?'—':t==='$'?CRE.money(v):t==='%'?v.toFixed(2)+'%':t==='x'?v.toFixed(2)+'×':String(Math.round(v*100)/100);
+ function recalc(){const vals={};Object.keys(nums).forEach(k=>{const e=$('f_'+k);vals[k]=e&&e.value!==''?parseFloat(e.value):0;});
+  calcs.forEach(f=>{let v=NaN;try{if(!/^[a-z0-9_+\-*\/().,\s]+$/i.test(f.expr))throw 0;const keys=Object.keys(vals);v=new Function(...keys,'pmt','min','max','return ('+f.expr+');')(...keys.map(k=>vals[k]),pmt,Math.min,Math.max);}catch(e){}
+   vals[f.k]=v;const el=document.querySelector('[data-calc="'+f.k+'"]');if(el)el.textContent=fmt(v,f.fmt);});}
+ if(C.kind==='w'&&n===12){const w1=await CRE.Data.sheet(1);CRE.$$('[data-cmp]').forEach(el=>{const k=el.dataset.cmp,a=parseFloat(w1[k]);el.dataset.base=isNaN(a)?'':a;});
+  const upd=()=>CRE.$$('[data-cmp]').forEach(el=>{const b=el.dataset.base,v=parseFloat($('f_'+el.dataset.cmp).value);el.textContent=b===''?'No Week 1 rating saved':(isNaN(v)?'Week 1: '+b:'Week 1: '+b+'  →  now '+v+'  ('+(v-b>=0?'+':'')+(v-b)+')');});upd();$('form').addEventListener('input',upd);}
+ let timer=null;const st=$('st');
+ function collect(){const o={};CRE.$$('input,textarea,select',form).forEach(e=>{if(!e.id)return;const k=e.id.replace(/^f_/,'');o[k]=e.type==='checkbox'?e.checked:e.value;});return o;}
+ const form=$('form');
+ async function save(){timer=null;if(!form.isConnected)return;st.textContent='Saving…';data=collect();const r=await CRE.Data.saveSheet(n,data);st.textContent=r.error?('Could not save: '+r.error):'Saved.';}
+ flush=async()=>{if(timer){clearTimeout(timer);await save();}};
+ $('form').addEventListener('input',()=>{recalc();st.textContent='Unsaved changes…';clearTimeout(timer);timer=setTimeout(save,900);});
+ $('form').addEventListener('change',()=>{recalc();clearTimeout(timer);timer=setTimeout(save,300);});
+ recalc();
+ $('pr').onclick=()=>window.print();
+ $('send').textContent='Send '+String(C.send).split(',')[0].replace(/^your /,'')+' to coach';
+ if(C.csv){const b=$('csv');b.style.display='';b.onclick=()=>{const rows=[C.csv.cols];const blob=new Blob([rows.map(r=>r.map(c=>'"'+c.replace(/"/g,'""')+'"').join(',')).join('\n')+'\n'],{type:'text/csv'});const x=document.createElement('a');x.href=URL.createObjectURL(blob);x.download=C.csv.name;x.click();};}
+ if(q.get('print'))setTimeout(()=>window.print(),500);
+}
+
+/* ---------- Coach ---------- */
+async function vCoach(){
+ title('Coach');
+ V.innerHTML=`<h1>Coaching desk</h1><p class="lead">Ask Savannah, send your work to Lijoy, join the live Q&amp;A, or book a call.</p><div id="deskb"></div>`;
+ if(!has1()&&!has2()){$('deskb').innerHTML=unlock('Coaching is included in both programs','Pick a program to get Lijoy and Savannah beside you for 90 days.');return;}
+ CRE.desk($('deskb'),has1()?'bcr90':'deal90');
+}
+
+/* ---------- Account ---------- */
+async function vAccount(){
+ title('My account');
+ V.innerHTML=`<div style="max-width:640px"><h1 style="margin-bottom:22px">My account</h1><div class="msg" id="m"></div>
+  <div class="card flat" style="margin-bottom:18px"><h3 style="margin-bottom:10px">Signed in</h3><dl class="acd"><div><dt>Registered email</dt><dd id="ae"></dd></div><div><dt>Sign-in method</dt><dd id="ap"></dd></div><div><dt>Member since</dt><dd id="as"></dd></div><div><dt>Programs</dt><dd id="apg"></dd></div></dl></div>
+  <div class="card flat" style="margin-bottom:18px"><div class="prof"><div class="avatar" id="av"></div><div><h3>Profile</h3><button class="linkgold" id="chg" type="button">Change photo</button><input type="file" id="file" accept="image/*" hidden></div></div>
+   <div class="field"><label for="nm">Name</label><input id="nm" autocomplete="name"></div><div class="field"><label for="ph">Phone</label><input id="ph" type="tel" autocomplete="tel"></div><div class="field"><label for="em">Email</label><input id="em" disabled></div>
+   <label class="chk2" style="margin:4px 0 14px"><input type="checkbox" id="mk"><span>Email me free lessons, deal tips and reminders</span></label><button class="btn navy sm" id="sn">Save profile</button></div>
+  <div class="card flat" style="margin-bottom:18px"><h3>Change password</h3><div class="field" style="margin-top:12px"><label for="pw">New password (8+ characters)</label><input id="pw" type="password" minlength="8" autocomplete="new-password"></div><button class="btn navy sm" id="sp">Update password</button></div>
+  <p><button class="btn ghost sm" id="lo">Log out</button></p></div>`;
+ const m=$('m'),show=(t,k)=>{m.className='msg show '+k;m.textContent=t;window.scrollTo({top:0,behavior:'smooth'});};
+ const ini=()=>((CRE.S.user.name||CRE.S.user.email||'?').split(/[ @]/).filter(Boolean).slice(0,2).map(x=>x[0].toUpperCase()).join(''))||'?';
+ const paintAv=u=>{$('av').innerHTML=u?`<img src="${E(u)}" alt="Your photo">`:ini();};
+ paintAv(await CRE.Auth.avatar());
+ {const u=CRE.S.user,L={email:'Email and password',google:'Google',apple:'Apple',facebook:'Facebook',phone:'Mobile phone'},pv=(u.providers&&u.providers.length?u.providers:[u.provider||'email']);
+  $('ae').textContent=u.email||('Phone '+u.phone);$('ap').textContent=[...new Set(pv)].map(x=>L[x]||x).join(', ');
+  $('as').textContent=u.created?new Date(u.created).toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}):'Today';
+  const own=CRE.Access.isOwner(),pg=Object.values(CRE.OFFERS).filter(o=>CRE.Access.has(o.slug)).map(o=>o.name);
+  $('apg').textContent=own?'All programs (owner access)':(pg.length?pg.join(', '):'Free library');}
+ $('nm').value=CRE.S.user.name||'';$('ph').value=CRE.S.user.phone||'';$('em').value=CRE.S.user.email||'';$('mk').checked=!!CRE.S.user.marketing;
+ if(CRE.params().get('reset')){show('Enter a new password below.','info');$('pw').focus();}
+ $('sn').onclick=async()=>{const r=await CRE.Auth.setProfile($('nm').value.trim(),$('ph').value.trim());if(!r.error&&$('mk').checked!==!!CRE.S.user.marketing)await CRE.Auth.setMarketing($('mk').checked);show(r.error||'Profile saved.',r.error?'err':'ok');};
+ $('chg').onclick=()=>$('file').click();
+ $('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const img=new Image();img.onload=()=>{const c=document.createElement('canvas'),s=Math.min(img.width,img.height),S=320;c.width=c.height=S;c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,S,S);
+  c.toBlob(async b=>{const d=c.toDataURL('image/jpeg',.85);const r=await CRE.Auth.setAvatar(b,d);if(r.error)show(r.error,'err');else{paintAv(r.url);show('Photo updated.','ok');}},'image/jpeg',.85);};img.src=URL.createObjectURL(f);};
+ $('sp').onclick=async()=>{if($('pw').value.length<8){show('Use at least 8 characters.','err');return;}const r=await CRE.Auth.setPassword($('pw').value);show(r.error||'Password updated.',r.error?'err':'ok');$('pw').value='';};
+ $('lo').onclick=()=>CRE.Auth.signOut();
+}
+
+/* ---------- router ---------- */
+const LOCK='<svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>';
+const GROUP={library:'library',lesson:'library',guide:'library',p1:'p1',week:'p1',p2:'p2',module:'p2',analyzer:'p2'};
+const VIEWS={library:vLibrary,lesson:vLesson,guide:vGuide,p1:vP1,p2:vP2,week:vWeek,module:vModule,analyzer:vAnalyzer,sheet:vSheet,coach:vCoach,account:vAccount};
+function comps(g){
+ const c=[['library','Free','Free Library','Free videos',true,'#/library'],['p1','Offer 1','Become a Commercial Realtor','90-day program',has1(),'#/p1'],['p2','Offer 2','Find Your First Deal','90-day program',has2(),'#/p2']];
+ return c.map(([k,sm,t,st,ok,href])=>`<a class="comp ${k===g?'on':''} ${ok?'':'lock'}" href="${href}"><small>${sm}</small><b>${t}</b><span>${ok?st:LOCK+' Locked'}</span></a>`).join('');
+}
+async function go(){
+ if(flush){const f=flush;flush=null;try{await f();}catch(e){}}
+ const my=++tok,h=location.hash.replace(/^#\/?/,''),[path,qs]=h.split('?'),parts=path.split('/').filter(Boolean),r=VIEWS[parts[0]]?parts[0]:(has1()?'p1':(has2()?'p2':'library'));
+ let g=GROUP[r]||'';if(r==='sheet')g=parts[1]==='w'?(has1()?'p1':'library'):'p2';if(r==='week'&&!has1())g='library';
+ $('tabs').innerHTML=r==='account'?'':comps(g);$('tabs').style.display=r==='account'?'none':'';
+ window.scrollTo(0,0);
+ try{await VIEWS[r](parts.slice(1),new URLSearchParams(qs||''));}catch(e){if(my===tok)console.error(e);}
+}
+window.addEventListener('hashchange',go);
+window.addEventListener('beforeunload',()=>{if(flush)flush();});
+go();
+});
+</script></body></html>

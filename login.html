@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Log in | CRE-Ed</title><meta name="description" content="Log in or create your free CRE-Ed account."><meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css"></head><body>
+<div class="authpage"><div class="authw">
+  <p class="eyebrow" id="ey">Start learning free</p>
+  <h1 id="ttl">Create your account</h1>
+  <p class="lead" id="sub">Your free library is ready when you are.</p>
+  <button class="soc" data-p="google"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.6a4.8 4.8 0 0 1-2.1 3.1v2.6h3.4c2-1.8 3.1-4.5 3.1-7.5z"/><path fill="#34A853" d="M12 22.5c2.8 0 5.2-.9 6.9-2.5l-3.4-2.6c-.9.6-2.1 1-3.5 1-2.7 0-5-1.8-5.8-4.3H2.7v2.7A10.5 10.5 0 0 0 12 22.5z"/><path fill="#FBBC05" d="M6.2 14.1a6.3 6.3 0 0 1 0-4.2V7.2H2.7a10.5 10.5 0 0 0 0 9.6z"/><path fill="#EA4335" d="M12 5.6c1.5 0 2.9.5 4 1.6l3-3A10.4 10.4 0 0 0 12 1.5 10.5 10.5 0 0 0 2.7 7.2l3.5 2.7C7 7.4 9.3 5.6 12 5.6z"/></svg>Continue with Google</button>
+  <button class="soc" data-p="apple"><svg viewBox="0 0 24 24"><path d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.9-.8-3.1-.8-1.6 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3.1.7c1.3 0 2.1-1.1 2.8-2.2.9-1.3 1.3-2.5 1.3-2.6-.1 0-2.5-1-2.5-3.9zM14.2 5.8c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.7 1.4-.6.7-1.1 1.8-1 2.9 1.1.1 2.1-.5 2.7-1.3z"/></svg>Continue with Apple</button>
+  <button class="soc" data-p="facebook"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#1877F2"/><path fill="#fff" d="M13.3 21v-7h2.4l.4-2.8h-2.8V9.5c0-.8.3-1.4 1.4-1.4h1.5V5.6c-.3 0-1.1-.1-2.1-.1-2.1 0-3.6 1.3-3.6 3.7v2h-2.4V14h2.4v7z"/></svg>Continue with Facebook</button>
+  <div class="or">or continue with</div>
+  <div class="seg"><button class="on" id="sE" type="button"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Email</button><button id="sP" type="button"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>Phone</button></div>
+  <div class="msg" id="m"></div>
+  <form id="f">
+    <div class="field" id="nm"><label for="fn">First name</label><input id="fn" autocomplete="given-name"></div>
+    <div id="em"><div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email"></div>
+    <div class="field"><label for="pw">Password</label><input id="pw" type="password" minlength="8" autocomplete="new-password"></div></div>
+    <div id="pn" style="display:none"><div class="field"><label for="phone">Mobile phone</label><input id="phone" type="tel" placeholder="+1 416 555 0123" autocomplete="tel"></div>
+    <div class="field" id="cdw" style="display:none"><label for="code">6-digit code we texted you</label><input id="code" inputmode="numeric" autocomplete="one-time-code"></div></div>
+    <label class="chk2" id="mkw"><input type="checkbox" id="mk"><span>Email me free lessons, deal tips and reminders. You can unsubscribe at any time.</span></label>
+    <button class="btn block lg" type="submit" id="go">Create free account</button>
+  </form>
+  <p class="sw" id="sw"></p>
+  <p style="margin:10px 0 0"><a href="#" id="fg" class="link fine" style="display:none">Forgot your password?</a></p>
+</div></div>
+<script src="assets/config.js"></script><script src="assets/weeks.js"></script><script src="assets/offer2.js"></script><script src="assets/library.js"></script><script src="assets/site.js"></script>
+<script>CRE.init({page:'login'}).then(()=>{
+ const q=CRE.params();let mode=q.get('mode')==='login'?'L':'S',via='E',sent=false;const next=q.get('next')||'members.html';
+ const $=id=>document.getElementById(id),m=$('m');
+ const show=(t,k)=>{m.className='msg show '+k;m.textContent=t;};
+ if(q.get('email'))$('email').value=q.get('email');
+ function paint(){
+  const S=mode==='S';
+  $('ey').textContent=S?'Start learning free':'Welcome back';$('ttl').textContent=S?'Create your account':'Log in';
+  $('sub').textContent=S?'Your free library is ready when you are.':'Pick up where you left off.';
+  $('nm').style.display=S?'block':'none';$('mkw').style.display=S?'flex':'none';
+  $('em').style.display=via==='E'?'block':'none';$('pn').style.display=via==='P'?'block':'none';
+  $('sE').classList.toggle('on',via==='E');$('sP').classList.toggle('on',via==='P');
+  $('go').textContent=via==='P'?(sent?'Verify and continue':'Text me a code'):(S?'Create free account':'Log in');
+  $('pw').autocomplete=S?'new-password':'current-password';$('fg').style.display=(!S&&via==='E')?'inline':'none';
+  $('sw').innerHTML=S?'Already have an account? <a href="#" id="tg">Log in</a>':'New here? <a href="#" id="tg">Create your free account</a>';
+  $('tg').onclick=e=>{e.preventDefault();mode=S?'L':'S';sent=false;m.className='msg';paint();};}
+ $('sE').onclick=()=>{via='E';sent=false;paint();};$('sP').onclick=()=>{via='P';paint();};paint();
+ if(CRE.S.user)location.replace(next);
+ CRE.$$('.soc').forEach(b=>b.onclick=async()=>{const r=await CRE.Auth.oauth(b.dataset.p);if(r.error){show(r.error,'err');return;}if(r.demo)location.href=next;});
+ $('f').onsubmit=async e=>{e.preventDefault();const go=$('go');go.disabled=true;let r,verifying=false;
+  const name=$('fn').value.trim(),mk=$('mk').checked;
+  if(via==='E'){
+   if(!$('email').value||!$('pw').value){go.disabled=false;show('Enter your email and password.','err');return;}
+   if(mode==='S'){
+    if(!name){go.disabled=false;show('Please enter your first name.','err');return;}
+    if($('pw').value.length<8){go.disabled=false;show('Use a password with at least 8 characters.','err');return;}
+    r=await CRE.Auth.signUp(name,$('email').value.trim(),$('pw').value,'',mk);}
+   else r=await CRE.Auth.signIn($('email').value.trim(),$('pw').value);
+  }else{
+   const ph=$('phone').value.trim();if(!/^[+]?[0-9 ()-]{10,}$/.test(ph)){go.disabled=false;show('Enter your mobile number with the area code.','err');return;}
+   if(!sent){r=await CRE.Auth.phoneStart(ph,name);if(r.ok){sent=true;$('cdw').style.display='block';paint();show(r.demo?'Demo mode: your code is 123456.':'We texted you a code.','info');}}
+   else{verifying=true;r=await CRE.Auth.phoneVerify(ph,$('code').value.trim(),name);}
+  }
+  go.disabled=false;
+  if(!r)return;
+  if(r.error){show(r.error,'err');return;}
+  if(r.confirm){show('Check your email to confirm your account, then log in.','ok');return;}
+  if(via==='E'||verifying)location.href=next;};
+ $('fg').onclick=async e=>{e.preventDefault();const em=$('email').value.trim();if(!em){show('Enter your email above first.','info');return;}const r=await CRE.Auth.reset(em);show(r.error||(r.demo?'Demo mode: password reset emails need the live setup.':'Password reset email sent.'),r.error?'err':'ok');};
+});
+</script></body></html>

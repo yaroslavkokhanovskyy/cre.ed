@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>About and Contact | CRE-Ed</title><meta name="description" content="Meet Lijoy Ulahannan, read his books, or get in touch."><meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css"></head><body class="gate">
+<section class="sec" style="padding-bottom:clamp(40px,6vw,72px)"><div class="wrap bio">
+  <img src="assets/lijoy.jpg" alt="Lijoy Ulahannan" loading="lazy">
+  <div>
+    <p class="eyebrow">Meet your coach</p>
+    <h1 style="font-size:clamp(36px,5vw,54px)">Lijoy Ulahannan</h1>
+    <p class="lead" style="margin-top:18px">Lijoy is an active Canadian commercial real estate practitioner, the author of three books, and a commercial mortgage broker with Mortgage Architects – A Better Way (ABW). He founded CRE-Ed and Golden Horseshoe Capital.</p>
+    <p class="lead">He built CRE-Ed because commercial real estate education is often theory from another country’s market. Everything here comes from more than 25 years of Ontario commercial deals.</p>
+    <ul class="checks"><li>Active practitioner: lessons come from current Canadian deals</li><li>Published author of three commercial real estate books</li><li>Broker and mortgage broker: you get the deal and the financing side</li></ul>
+    <p style="margin:24px 0 0"><a class="btn" href="login.html?mode=signup">Get free access</a> <a class="btn ghost" href="programs.html">See coaching</a></p>
+  </div>
+</div></section>
+
+<section class="sec paper"><div class="wrap">
+  <div class="sh"><h2>Books by Lijoy</h2></div>
+  <div class="books" id="books"></div>
+</div></section>
+
+<section class="sec" id="contact"><div class="wrap contact">
+  <div><h2>Get in touch</h2><p class="lead" style="margin-top:14px">Questions about coaching, the programs or a commercial opportunity are welcome.</p>
+    <div class="rows"><a id="ce" href="#"><svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span></span></a><a id="cp" href="#"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span></span></a></div>
+    <div class="soci" id="soc"><a href="#" data-s="tiktok" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.4 2.6 2 4.2 5 4.4"/></svg></a><a href="#" data-s="instagram" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg></a><a href="#" data-s="linkedin" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M6 9v10M6 5.2v.1M10 19V9m0 4c0-2.4 1.6-4 3.8-4S18 10.4 18 13v6"/></svg></a></div></div>
+  <div class="card"><div class="msg" id="m"></div>
+    <form id="f"><div class="row2"><div class="field"><label for="n">Name</label><input id="n" required autocomplete="name"></div><div class="field"><label for="e">Email</label><input id="e" type="email" required autocomplete="email"></div></div>
+    <div class="field"><label for="ph">Phone (optional)</label><input id="ph" type="tel" autocomplete="tel"></div>
+    <div class="field"><label for="ms">Message</label><textarea id="ms" required></textarea></div>
+    <button class="btn" type="submit">Send message</button></form></div>
+</div></section>
+<script src="assets/config.js"></script><script src="assets/weeks.js"></script><script src="assets/offer2.js"></script><script src="assets/library.js"></script><script src="assets/site.js"></script>
+<script>CRE.init({page:'about',auth:true}).then(ok=>{if(!ok)return;
+ const $=id=>document.getElementById(id),C=CRE.CFG,L=C.BOOK_LINKS||{};
+ $('books').innerHTML=CRE.BOOKS.map(b=>{const link=L[b.slug];
+  return `<article class="book"><img src="${b.img}" alt="${CRE.esc(b.title)} cover" loading="lazy"><h3>${CRE.esc(b.title)}</h3><p>${CRE.esc(b.desc)}</p><div class="row"><span class="pr">$${b.price.toFixed(2)}</span><a class="btn sm ghost" ${link?`href="${CRE.esc(link)}" target="_blank" rel="noopener"`:'href="?topic=Books#contact"'}>${link?'Buy':'Ask about it'}</a></div></article>`}).join('');
+ if(C.CONTACT_EMAIL){$('ce').href='mailto:'+C.CONTACT_EMAIL;$('ce').querySelector('span').textContent=C.CONTACT_EMAIL;}
+ if(C.CONTACT_PHONE){$('cp').href='tel:'+C.CONTACT_PHONE.replace(/[^0-9+]/g,'');$('cp').querySelector('span').textContent=C.CONTACT_PHONE;}
+ CRE.$$('#soc a').forEach(a=>{const u=(C.SOCIAL||{})[a.dataset.s];if(u){a.href=u;a.target='_blank';a.rel='noopener';}else a.remove();});
+ if(!CRE.$$('#soc a').length)$('soc').remove();
+ const t=CRE.params().get('topic');
+ if(CRE.S.user){$('e').value=CRE.S.user.email||'';$('n').value=CRE.S.user.name||'';$('ph').value=CRE.S.user.phone||'';}
+ if(t)$('ms').value='Topic: '+t+'\n\n';
+ $('f').onsubmit=async e=>{e.preventDefault();const m=$('m');const r=await CRE.Data.contact($('n').value,$('e').value,'Contact form',($('ph').value?'Phone: '+$('ph').value+'\n\n':'')+$('ms').value);
+  m.className='msg show '+(r.ok?'ok':'err');m.textContent=r.ok?'Thank you. Your message has been sent.':(r.error||'Could not send.');if(r.ok)$('ms').value='';};
+});
+</script></body></html>

@@ -1,0 +1,36 @@
+/* Free library: what a free account unlocks. Edit freely. */
+window.CREED_LIB = {
+  items: [],
+  glossary: [
+    ['Amortization', 'The number of years it takes to pay a loan down to zero. Longer amortization means lower payments.'],
+    ['Anchor tenant', 'A large, well-known tenant that draws traffic and gives lenders confidence in a retail or office property.'],
+    ['BOV (broker opinion of value)', 'A broker’s estimate of what a property is worth, based on its income and recent comparable sales. It is not a formal appraisal.'],
+    ['CAM (common area maintenance)', 'Charges tenants pay for shared costs such as snow removal, landscaping, lighting and cleaning.'],
+    ['Cap rate', 'NOI divided by the price. It tells you the yearly return if you bought with all cash, and is the fastest way to compare buildings.'],
+    ['Capital expenditures (CapEx)', 'Big, occasional costs like a new roof or parking lot. They are not part of regular operating expenses.'],
+    ['Cash-on-cash return', 'Yearly cash flow after loan payments, divided by the cash you put in.'],
+    ['Closing costs', 'Legal fees, land transfer tax, lender fees and other costs paid when a purchase completes.'],
+    ['DSCR (debt service coverage ratio)', 'NOI divided by yearly loan payments. Lenders usually want to see well above 1.0, often 1.2 or more.'],
+    ['Due diligence', 'The window after an accepted offer when the buyer checks leases, financials, the building and the title before committing.'],
+    ['Effective gross income', 'Rent you expect to collect after allowing for vacancy and unpaid rent.'],
+    ['Equity gap', 'The cash a buyer must find on top of what the lender will lend. It is the price plus costs, minus the loan.'],
+    ['Estoppel certificate', 'A tenant’s signed statement confirming their lease terms, rent and any disputes, so a buyer can trust the paperwork.'],
+    ['Gross lease', 'A lease where the landlord pays most operating costs and the tenant pays one rent amount.'],
+    ['Gross rent multiplier', 'The price divided by yearly gross rent. A rough, quick screen before you do the full numbers.'],
+    ['Letter of intent (LOI)', 'A short, usually non-binding outline of the main terms a buyer or tenant proposes before a full contract is written.'],
+    ['Lease abstract', 'A one-page summary of a lease: tenant, term, rent, renewals, who pays what, and key dates.'],
+    ['Loan-to-value (LTV)', 'The loan amount divided by the property’s value. A 65% LTV means the lender provides 65% and you provide the rest.'],
+    ['Net operating income (NOI)', 'Rental income minus operating expenses, before loan payments and income tax. It drives the value of a commercial building.'],
+    ['Operating expenses', 'The costs of running a building: property tax, insurance, utilities, repairs, management and reserves.'],
+    ['Pro forma', 'A forecast of a property’s income and expenses, often based on future or improved rents rather than today’s.'],
+    ['Rent roll', 'A list of every tenant with their unit, rent, lease start and end dates. It is the first document a buyer asks for.'],
+    ['Stabilized property', 'A building that is leased up and running at normal occupancy, with no major work planned.'],
+    ['Tenant improvement allowance', 'Money a landlord contributes to build out a tenant’s space.'],
+    ['Term', 'How long a mortgage or lease contract runs before it must be renewed or repaid.'],
+    ['Triple net (NNN) lease', 'A lease where the tenant pays base rent plus property tax, insurance and maintenance.'],
+    ['Vacancy and credit loss', 'An allowance for empty units and tenants who do not pay, subtracted from potential rent.'],
+    ['Value-add', 'Buying a building with room to improve, by raising rents, filling space or cutting costs, to increase its value.'],
+    ['Vendor take-back (VTB) mortgage', 'The seller finances part of the purchase price, which can close an equity gap.'],
+    ['Weighted average lease term', 'The average time left on all leases in a building, weighted by rent. Longer usually means safer income.']
+  ]
+};
